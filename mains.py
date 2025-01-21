@@ -6,7 +6,7 @@ import os
 import time
 
 # Initialize the client for Hugging Face API
-client = InferenceClient("ostris/Flex.1-alpha", token="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")
+client = InferenceClient("stabilityai/stable-diffusion-3.5-large", token="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")
 
 # Function to generate an icon using Hugging Face API
 def generate_icon(icon_name, width, height):
