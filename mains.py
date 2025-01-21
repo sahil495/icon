@@ -6,19 +6,16 @@ import os
 import time
 
 # Initialize the client for Hugging Face API
-client = InferenceClient("stabilityai/stable-diffusion-3.5-large", token="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")
+client = InferenceClient("ostris/Flex.1-alpha", token="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")
 
 # Function to generate an icon using Hugging Face API
-def generate_icon(icon_name, selected_colors, width, height):
-    if not selected_colors:
-        st.warning("Please select at least one color.")
-        return None, None
-
+def generate_icon(icon_name, width, height):
     if not icon_name:
         st.warning("Please enter an icon name.")
         return None, None
 
-    description = f"icon of a {icon_name} in {' and '.join(selected_colors)} color clear"
+    # Use descriptive words to generate simple, clear, minimalist icons
+    description = f"simple, clean, minimalist icon of a {icon_name} with clear lines in black and white, like Bootstrap icons"
     st.info(f"Generating image for: {description} ...")
 
     try:
@@ -57,49 +54,23 @@ def convert_to_svg(image):
 # Streamlit App UI
 st.title("Icon Generator App with SVG Support")
 
-# Sidebar for color selection
-st.sidebar.header("Select Colors")
-colors = {
-    "gray": "Black & White",
-    "violet": "Violet",
-    "indigo": "Indigo",
-    "blue": "Blue",
-    "green": "Green",
-    "yellow": "Yellow",
-    "orange": "Orange",
-    "red": "Red",
-}
-selected_colors = [color for color, name in colors.items() if st.sidebar.checkbox(name, value=color == "gray")]
-
 # Icon name input
 icon_name = st.text_input("Enter the icon name:", "")
 
-# Dimensions input
-col1, col2 = st.columns(2)
-with col1:
-    width = st.number_input("Width:", value=512, min_value=1, max_value=2048, step=1)
-with col2:
-    height = st.number_input("Height:", value=512, min_value=1, max_value=2048, step=1)
+# Fixed width and height
+width = 512
+height = 512
 
-# Format selection
-image_format = st.selectbox("Select image format:", ["PNG", "JPG", "JPEG", "SVG"])
+# Inform the user about the default size
+st.write("The image will be generated with a default size of 512x512.")
 
 # Generate button
 if st.button("Generate"):
-    if icon_name and selected_colors:
-        image, _ = generate_icon(icon_name, selected_colors, width, height)
+    if icon_name:
+        image, _ = generate_icon(icon_name, width, height)
 
         if image:
-            if image_format == "SVG":
-                # Convert to SVG
-                svg_path, svg_code = convert_to_svg(image)
-                st.success(f"SVG file generated.")
-                st.download_button("Download SVG", data=svg_code, file_name="output_image.svg", mime="image/svg+xml")
-            else:
-                # Save the image in the selected format
-                output_path = f"output_image.{image_format.lower()}"
-                image.save(output_path, format=image_format.upper())
-                st.image(image, caption="Generated Icon", use_column_width=True)
-                with open(output_path, "rb") as file:
-                    st.download_button(label="Download Image", data=file, file_name=output_path)
-
+            # Convert to SVG
+            svg_path, svg_code = convert_to_svg(image)
+            st.success(f"SVG file generated.")
+            st.download_button("Download SVG", data=svg_code, file_name="output_image.svg", mime="image/svg+xml")
