@@ -7,3 +7,5 @@ torchvision==0.16.0+cpu
 torchaudio==2.1.0+cpu
 svgwrite==1.4.3
 pillow==11.1.0
+numpy>=1.21.6
+protobuf>=3.20.3
