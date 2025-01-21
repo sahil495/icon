@@ -1,14 +1,18 @@
 import streamlit as st
-from huggingface_hub import InferenceClient
+from transformers import pipeline
 from PIL import Image as PILImage
 import svgwrite  # For SVG generation
 import os
 import time
 
-# Initialize the client for Hugging Face API
-client = InferenceClient("stabilityai/stable-diffusion-3.5-large", token="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")
+# Initialize the pipeline for Stable Diffusion
+text_to_image = pipeline(
+    task="text-to-image",
+    model="stabilityai/stable-diffusion-3.5-large",
+    use_auth_token="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"
+)
 
-# Function to generate an icon using Hugging Face API
+# Function to generate an icon using Stable Diffusion
 def generate_icon(icon_name, selected_colors, width, height):
     if not selected_colors:
         st.warning("Please select at least one color.")
@@ -23,9 +27,10 @@ def generate_icon(icon_name, selected_colors, width, height):
 
     try:
         start_time = time.time()
-        image = client.text_to_image(description)
+        images = text_to_image(description)
         end_time = time.time()
         st.success(f"Image generated in {end_time - start_time:.2f} seconds.")
+        image = PILImage.fromarray(images[0])
     except Exception as e:
         st.error(f"Error generating image: {e}")
         return None, None
@@ -33,6 +38,7 @@ def generate_icon(icon_name, selected_colors, width, height):
     # Resize the image
     image = image.resize((width, height))
     return image, None
+
 
 # Function to convert an image to SVG
 def convert_to_svg(image):
